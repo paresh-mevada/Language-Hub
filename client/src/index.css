@@ -1,0 +1,310 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  --color-brand-50: #f0fdfa;
+  --color-brand-100: #ccfbf1;
+  --color-brand-400: #2dd4bf;
+  --color-brand-500: #14b8a6;
+  --color-brand-600: #0d9488;
+  --color-brand-700: #0f766e;
+
+  --color-accent-violet: #8b5cf6;
+  --color-accent-indigo: #6366f1;
+  --color-accent-emerald: #10b981;
+  --color-accent-amber: #f59e0b;
+  --color-accent-rose: #f43f5e;
+}
+
+/* Root & Theme Setup */
+html {
+  font-family: var(--font-sans);
+  background-color: #030712;
+  color: #f3f4f6;
+  scroll-behavior: smooth;
+}
+
+html.light {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  background-color: inherit;
+  color: inherit;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+}
+
+/* Glassmorphism & Surface Utilities */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.glass-card {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  color: #f8fafc;
+}
+
+html.light .glass-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  color: #0f172a;
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(45, 212, 191, 0.4);
+  box-shadow: 0 20px 40px -15px rgba(20, 184, 166, 0.15), 0 0 20px -5px rgba(99, 102, 241, 0.1);
+}
+
+html.light .glass-card-hover:hover {
+  border-color: rgba(20, 184, 166, 0.5);
+  box-shadow: 0 20px 35px -10px rgba(20, 184, 166, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+}
+
+.glass-input {
+  background: rgba(3, 7, 18, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f3f4f6;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+html.light .glass-input {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  color: #0f172a;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: rgba(45, 212, 191, 0.6);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+/* Light mode specific text contrast overrides */
+html.light .text-slate-100,
+html.light .text-slate-200,
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-300,
+html.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .bg-slate-900,
+html.light .bg-slate-950 {
+  background-color: #ffffff !important;
+}
+
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/90,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-950\/60,
+html.light .bg-slate-950\/80,
+html.light .bg-slate-950\/40 {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+}
+
+html.light .border-slate-800,
+html.light .border-slate-800\/80,
+html.light .border-slate-800\/60 {
+  border-color: #e2e8f0 !important;
+}
+
+html.light .border-slate-700 {
+  border-color: #cbd5e1 !important;
+}
+
+/* Hero Banners in Light Mode */
+html.light .bg-gradient-to-r.from-slate-900,
+html.light .bg-gradient-to-br.from-slate-900 {
+  background: linear-gradient(135deg, #0f766e 0%, #115e59 100%) !important;
+}
+
+html.light .bg-gradient-to-r.from-slate-900 .text-white,
+html.light .bg-gradient-to-r.from-slate-900 .text-slate-100,
+html.light .bg-gradient-to-r.from-slate-900 .text-slate-200,
+html.light .bg-gradient-to-br.from-slate-900 .text-white,
+html.light .bg-gradient-to-br.from-slate-900 .text-slate-100,
+html.light .bg-gradient-to-br.from-slate-900 .text-slate-200 {
+  color: #ffffff !important;
+}
+
+html.light .bg-gradient-to-r.from-slate-900 .text-slate-400,
+html.light .bg-gradient-to-br.from-slate-900 .text-slate-400 {
+  color: #ccfbf1 !important;
+}
+
+/* Ambient glow */
+.bg-ambient-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+html.light .bg-ambient-glow {
+  opacity: 0.06;
+}
+
+/* Shimmer loader */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+      rgba(30, 41, 59, 0.5) 25%,
+      rgba(51, 65, 85, 0.7) 50%,
+      rgba(30, 41, 59, 0.5) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+html.light .shimmer {
+  background: linear-gradient(90deg,
+      rgba(241, 245, 249, 0.8) 25%,
+      rgba(226, 232, 240, 0.9) 50%,
+      rgba(241, 245, 249, 0.8) 75%);
+}
+
+/* Sound wave animation */
+@keyframes soundwave {
+
+  0%,
+  100% {
+    height: 6px;
+  }
+
+  50% {
+    height: 24px;
+  }
+}
+
+.animate-wave-1 {
+  animation: soundwave 1.2s ease-in-out infinite;
+}
+
+.animate-wave-2 {
+  animation: soundwave 1.2s ease-in-out 0.2s infinite;
+}
+
+.animate-wave-3 {
+  animation: soundwave 1.2s ease-in-out 0.4s infinite;
+}
+
+.animate-wave-4 {
+  animation: soundwave 1.2s ease-in-out 0.1s infinite;
+}
+
+.animate-wave-5 {
+  animation: soundwave 1.2s ease-in-out 0.3s infinite;
+}
+
+.voice-wave-3 {
+  animation-delay: 0.3s;
+}
+
+.voice-wave-4 {
+  animation-delay: 0.45s;
+}
+
+.voice-wave-5 {
+  animation-delay: 0.6s;
+}
+
+/* Ambient glow */
+.bg-ambient-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+html.light .bg-ambient-glow {
+  opacity: 0.05;
+}
+
+/* Shimmer loader */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+      rgba(30, 41, 59, 0.5) 25%,
+      rgba(51, 65, 85, 0.7) 50%,
+      rgba(30, 41, 59, 0.5) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
+}
+
+html.light .shimmer {
+  background: linear-gradient(90deg,
+      rgba(241, 245, 249, 0.8) 25%,
+      rgba(226, 232, 240, 0.9) 50%,
+      rgba(241, 245, 249, 0.8) 75%);
+}
