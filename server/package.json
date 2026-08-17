@@ -5,11 +5,11 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node --dns-result-order=ipv4first server.js",
+    "dev": "nodemon --exec \"node --dns-result-order=ipv4first\" server.js"
   },
   "nodemonConfig": {
-    "ignore": [".env"]
+    "ignore": []
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
