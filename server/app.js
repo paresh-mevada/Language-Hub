@@ -13,8 +13,21 @@ import userRoutes from './routes/userRoutes.js';
 import vocabularyRoutes from './routes/vocabularyRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 import { notFound } from './middleware/notFoundMiddleware.js';
+import { isDatabaseConnected } from './config/db.js';
 
 const app = express();
+
+// Middleware: block DB-dependent requests with a clean 503 when not connected
+function requireDatabase(_req, res, next) {
+  if (!isDatabaseConnected()) {
+    return res.status(503).json({
+      success: false,
+      message: 'The database is currently unavailable. Please try again shortly.',
+    });
+  }
+  next();
+}
+
 
 // 1. Helmet HTTP Security Headers
 app.use(helmet());
@@ -100,23 +113,24 @@ const authLimiter = rateLimit({
 });
 
 app.use('/api', globalLimiter);
-app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/auth', authLimiter, requireDatabase, authRoutes);
 
-// Health check
+// Health check — always responds even when DB is down
 app.get('/api/health', (_request, response) => {
   response.status(200).json({
     success: true,
     message: 'Language Hub API is running safely and securely',
+    database: isDatabaseConnected() ? 'connected' : 'disconnected',
   });
 });
 
-// App API routes
-app.use('/api/users', userRoutes);
-app.use('/api/conversations', conversationRoutes);
-app.use('/api/grammar', grammarRoutes);
-app.use('/api/vocabulary', vocabularyRoutes);
-app.use('/api/lessons', lessonRoutes);
-app.use('/api/progress', progressRoutes);
+// App API routes — all require a live DB connection
+app.use('/api/users', requireDatabase, userRoutes);
+app.use('/api/conversations', requireDatabase, conversationRoutes);
+app.use('/api/grammar', requireDatabase, grammarRoutes);
+app.use('/api/vocabulary', requireDatabase, vocabularyRoutes);
+app.use('/api/lessons', requireDatabase, lessonRoutes);
+app.use('/api/progress', requireDatabase, progressRoutes);
 
 // Error handling
 app.use(notFound);

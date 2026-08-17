@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
-const MAX_RETRIES = 5;
-const RETRY_DELAY_MS = 3000;
+// Cache the connection promise so serverless invocations reuse it
+// instead of opening a new connection on every cold start.
+let connectionPromise = null;
 
 async function connectDatabase() {
   const { MONGODB_URI } = process.env;
@@ -11,42 +12,67 @@ async function connectDatabase() {
     return;
   }
 
+  // Already connected — reuse existing connection (important for serverless)
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
+
+  // If a connection attempt is already in progress, wait for it
+  if (connectionPromise) {
+    await connectionPromise;
+    return;
+  }
+
   mongoose.set('strictQuery', true);
 
-  // Reconnect automatically if the connection drops after initial connect
   mongoose.connection.on('disconnected', () => {
-    console.warn('[DB] MongoDB disconnected. Mongoose will attempt to reconnect automatically.');
+    console.warn('[DB] MongoDB disconnected.');
+    connectionPromise = null; // allow reconnect on next request
   });
 
   mongoose.connection.on('reconnected', () => {
-    console.log('[DB] MongoDB reconnected successfully.');
+    console.log('[DB] MongoDB reconnected.');
   });
 
-  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-    try {
-      await mongoose.connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 8000,   // give up per-attempt after 8s
-        socketTimeoutMS: 45000,
-      });
-      console.log(`[DB] MongoDB connected: ${mongoose.connection.host}`);
-      return; // success – stop retrying
-    } catch (err) {
-      const isLast = attempt === MAX_RETRIES;
-      console.error(
-        `[DB] Connection attempt ${attempt}/${MAX_RETRIES} failed: ${err.message}` +
-        (isLast ? '' : ` — retrying in ${RETRY_DELAY_MS / 1000}s…`)
-      );
+  connectionPromise = (async () => {
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY_MS = 2000;
 
-      if (isLast) {
-        // Log clearly but do NOT re-throw; let the API start in degraded mode
-        console.error('[DB] Could not connect to MongoDB after all retries. API will run without a database.');
-        console.error('[DB] Check your MONGODB_URI, network access, and MongoDB Atlas IP whitelist.');
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        await mongoose.connect(MONGODB_URI, {
+          serverSelectionTimeoutMS: 10000,
+          socketTimeoutMS: 45000,
+          maxPoolSize: 10,
+        });
+        console.log(`[DB] MongoDB connected: ${mongoose.connection.host}`);
         return;
-      }
+      } catch (err) {
+        const isLast = attempt === MAX_RETRIES;
+        console.error(
+          `[DB] Attempt ${attempt}/${MAX_RETRIES} failed: ${err.message}` +
+          (isLast ? '' : ` — retrying in ${RETRY_DELAY_MS / 1000}s…`)
+        );
 
-      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+        if (isLast) {
+          connectionPromise = null;
+          console.error('[DB] All retries exhausted. API running without database.');
+          console.error('[DB] → Verify MONGODB_URI is set in your deployment environment variables.');
+          return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
+      }
     }
-  }
+  })();
+
+  await connectionPromise;
+}
+
+/**
+ * Returns true if Mongoose currently has an active connection.
+ */
+export function isDatabaseConnected() {
+  return mongoose.connection.readyState === 1;
 }
 
 export default connectDatabase;
