@@ -28,11 +28,16 @@ const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173,http://
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+      // Allow requests with no origin (mobile apps, curl, server-to-server)
       if (!origin) return callback(null, true);
+      // Allow any explicitly listed origin from CLIENT_URL env var
       if (allowedOrigins.includes(origin)) return callback(null, true);
       // Allow any local dev origin (localhost or 127.0.0.1 on any port)
       if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+      // Allow all Vercel preview & production deployments (*.vercel.app)
+      if (/^https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/.test(origin)) {
         return callback(null, true);
       }
       return callback(new Error('Not allowed by CORS'));

@@ -27,10 +27,13 @@ function signToken(userId) {
 }
 
 function setAuthCookie(response, token, rememberMe = false) {
+  const isProduction = process.env.NODE_ENV === 'production';
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isProduction,
+    // 'none' required for cross-domain (Vercel frontend → separate API host)
+    // 'lax' works fine for same-domain local dev
+    sameSite: isProduction ? 'none' : 'lax',
   };
 
   if (rememberMe) {
@@ -125,10 +128,11 @@ export const login = asyncHandler(async (request, response) => {
 });
 
 export function logout(_request, response) {
+  const isProduction = process.env.NODE_ENV === 'production';
   response.clearCookie('token', {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
   });
   response.status(200).json({ success: true, message: 'Logged out successfully.' });
 }
