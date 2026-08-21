@@ -1,9 +1,8 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { LoaderCircle } from 'lucide-react';
+import PageLoader from './components/common/PageLoader.jsx';
 import AppLayout from './components/layout/AppLayout.jsx';
 import Dashboard from './pages/Dashboard.jsx';
-import FeaturePlaceholder from './pages/FeaturePlaceholder.jsx';
 import Grammar from './pages/Grammar.jsx';
 import LessonDetail from './pages/LessonDetail.jsx';
 import Lessons from './pages/Lessons.jsx';
@@ -15,14 +14,6 @@ import Settings from './pages/Settings.jsx';
 import Tutor from './pages/Tutor.jsx';
 import Vocabulary from './pages/Vocabulary.jsx';
 import useAuthStore from './context/authStore.js';
-
-function PageLoader() {
-  return (
-    <main className="grid min-h-screen place-items-center bg-slate-950 text-slate-200">
-      <LoaderCircle className="size-7 animate-spin text-teal-300" aria-label="Loading" />
-    </main>
-  );
-}
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuthStore();
@@ -75,11 +66,5 @@ function App() {
     </BrowserRouter>
   );
 }
-
-
-
-
-
-
 
 export default App;

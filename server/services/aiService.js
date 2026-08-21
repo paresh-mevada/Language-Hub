@@ -51,7 +51,7 @@ function getDefaultModel() {
   const baseURL = process.env.AI_BASE_URL || '';
 
   if (apiKey.startsWith('gsk_') || baseURL.includes('groq.com')) {
-    return 'llama-3.3-70b-versatile';
+    return 'groq/compound';
   }
 
   if (apiKey.startsWith('xai-') || baseURL.includes('x.ai')) {
@@ -59,6 +59,11 @@ function getDefaultModel() {
   }
 
   return 'gpt-4o-mini';
+}
+
+function cleanContent(text) {
+  if (!text) return '';
+  return text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
 }
 
 function createTutorInstruction(learningLanguage, userLevel) {
@@ -134,7 +139,7 @@ In the meantime, you are practicing **${learningLanguage}** at a **${userLevel}*
       temperature: 0.7,
     });
 
-    const content = chatResponse.choices?.[0]?.message?.content?.trim();
+    const content = cleanContent(chatResponse.choices?.[0]?.message?.content);
     if (!content) {
       throw new AIServiceError('The AI tutor did not return a response. Please try again.');
     }
@@ -212,7 +217,7 @@ Do NOT wrap in markdown block. Output strict raw JSON only.`;
       rawOutput = chatResponse.choices?.[0]?.message?.content?.trim() || '';
     }
 
-    const cleanJson = rawOutput.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+    const cleanJson = cleanContent(rawOutput).replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
     const parsed = JSON.parse(cleanJson);
 
     return {
